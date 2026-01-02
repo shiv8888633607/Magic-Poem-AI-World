@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Magic AI Poem World ✨</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); text-align: center; padding: 50px; min-height: 100vh; }
+        .card { background: white; padding: 40px; border-radius: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); display: inline-block; width: 90%; max-width: 500px; }
+        h1 { color: #5d5dff; font-size: 2.5em; margin-bottom: 10px; }
+        input { width: 80%; padding: 15px; border-radius: 50px; border: 2px solid #ddd; outline: none; font-size: 1.1em; margin-bottom: 20px; transition: 0.3s; }
+        input:focus { border-color: #5d5dff; }
+        .btn-magic { background: #5d5dff; color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 1.1em; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(93, 93, 255, 0.4); }
+        .btn-magic:hover { transform: scale(1.05); background: #4a4aff; }
+        .btn-voice { background: #ff4757; color: white; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; margin-top: 10px; }
+        #poemResult { margin-top: 30px; padding: 20px; background: #f9f9f9; border-radius: 15px; font-style: italic; color: #333; line-height: 1.6; font-size: 1.2em; white-space: pre-line; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>✨ Magic Poem ✨</h1>
+        <p>Type a topic and let the AI write a poem!</p>
+        
+        <input type="text" id="topicInput" placeholder="Enter topic (e.g. Magic Robot)">
+        <br>
+        <button class="btn-magic" onclick="generatePoem()">Generate Poem 🪄</button>
+        
+        <div id="poemResult"></div>
+        <button id="speakBtn" class="btn-voice" style="display:none;" onclick="speakPoem()">🔊 Listen Poem</button>
+    </div>
+
+    <script>
+        async function generatePoem() {
+            const topic = document.getElementById('topicInput').value;
+            const poemDiv = document.getElementById('poemResult');
+            const speakBtn = document.getElementById('speakBtn');
+
+            if (!topic) return alert("Bhai, topic toh daalo!");
+
+            poemDiv.style.display = 'block';
+            poemDiv.innerText = "Wait... Magic is happening... 🪄";
+            speakBtn.style.display = 'none';
+
+            try {
+                // Ye line hamare local server (localhost:5000) se connect karegi
+                const response = await fetch('http://localhost:5000/generate-poem', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic: topic })
+                });
+
+                const data = await response.json();
+                poemDiv.innerText = data.poem;
+                speakBtn.style.display = 'inline-block';
+            } catch (error) {
+                poemDiv.innerText = "Error: Server connect nahi ho raha!";
+            }
+        }
+
+        // Text-to-Speech (Poem bol kar sunayega)
+        function speakPoem() {
+            const text = document.getElementById('poemResult').innerText;
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.rate = 0.9;
+            speech.pitch = 1.2;
+            window.speechSynthesis.speak(speech);
+        }
+    </script>
+</body>
+</html>
